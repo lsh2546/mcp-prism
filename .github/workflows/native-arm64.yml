@@ -36,11 +36,14 @@ jobs:
       - name: Run server, proxy, and alternating benchmark
         run: |
           third_party/llama.cpp/build/bin/llama-server -m models/qwen2.5-1.5b-instruct-q4_k_m.gguf --host 127.0.0.1 --port 8080 -c 16384 -t 4 --jinja > results/arm64/llama-server.log 2>&1 &
-          for i in $(seq 1 120); do curl -fsS http://127.0.0.1:8080/health && break; sleep 1; done
+          for i in $(seq 1 120); do curl -fsS http://127.0.0.1:8080/health && LLAMA_READY=1 && break; sleep 1; done
+          test "${LLAMA_READY:-0}" = 1 || { cat results/arm64/llama-server.log; exit 1; }
           python -m mcp_prism.cli proxy --host 127.0.0.1 --port 8090 --upstream http://127.0.0.1:8080 > results/arm64/prism.log 2>&1 &
-          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8090/health && break; sleep 1; done
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8090/health && PRISM_READY=1 && break; sleep 1; done
+          test "${PRISM_READY:-0}" = 1 || { cat results/arm64/prism.log; exit 1; }
           python scripts/benchmark_proxy.py --out results/arm64/raw.json --repetitions 5 --warmup 2
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: native-arm64-results
           path: results/arm64
