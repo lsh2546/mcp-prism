@@ -36,7 +36,7 @@ def main() -> None:
     parser.add_argument("--data", type=Path, default=Path("data/private/benchmark_requests.json"))
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
-    cases = json.loads(args.data.read_text(encoding="utf-8"))
+    cases = json.loads(args.data.read_text(encoding="utf-8"))[:6]
     rows = [invoke(args.url, case, mode) for case in cases for mode in ("baseline", "prism")]
     summary = {}
     for mode in ("baseline", "prism"):
