@@ -53,11 +53,12 @@ def request_once(url: str, row: dict[str, Any], mode: str, cache: bool) -> dict[
             if body == "[DONE]":
                 break
             event = json.loads(body)
-            if ttft is None and event.get("choices"):
-                delta = event["choices"][0].get("delta", {})
+            choices = event.get("choices") or []
+            if ttft is None and choices:
+                delta = choices[0].get("delta", {})
                 if delta.get("content") or delta.get("tool_calls"):
                     ttft = time.perf_counter() - started
-            for call in event.get("choices", [{}])[0].get("delta", {}).get("tool_calls", []):
+            for call in (choices[0].get("delta", {}).get("tool_calls", []) if choices else []):
                 name = call.get("function", {}).get("name")
                 if name and name not in tool_names:
                     tool_names.append(name)
