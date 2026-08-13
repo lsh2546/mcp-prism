@@ -1,8 +1,6 @@
 name: native-arm64-benchmark
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 jobs:
   benchmark:
     runs-on: ubuntu-24.04-arm
