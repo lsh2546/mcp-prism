@@ -1,8 +1,6 @@
 name: native-arm64-benchmark
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 jobs:
   benchmark:
     runs-on: ubuntu-24.04-arm
@@ -25,8 +23,13 @@ jobs:
           python -m pip install --only-binary=:all: "setuptools>=69" wheel
           python -m pip install --only-binary=:all: --no-build-isolation -e .
           python scripts/fetch_model.py
+      - uses: actions/cache@v4
+        id: llama-cache
+        with:
+          path: third_party/llama.cpp
+          key: llama-b9623-kleidiai-${{ runner.arch }}
       - name: Build pinned llama.cpp with KleidiAI
-        id: llama-build
+        if: steps.llama-cache.outputs.cache-hit != 'true'
         run: |
           git clone --depth 1 --branch b9623 https://github.com/ggml-org/llama.cpp.git third_party/llama.cpp
           cmake -S third_party/llama.cpp -B third_party/llama.cpp/build -DGGML_CPU_KLEIDIAI=ON -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
@@ -45,6 +48,7 @@ jobs:
           for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8090/health && PRISM_READY=1 && break; sleep 1; done
           test "${PRISM_READY:-0}" = 1 || { cat results/arm64/prism.log; exit 1; }
           python scripts/benchmark_proxy.py --out results/arm64/raw.json --repetitions 5 --warmup 2
+          python scripts/evaluate_llm_quality.py --out results/arm64/quality.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
