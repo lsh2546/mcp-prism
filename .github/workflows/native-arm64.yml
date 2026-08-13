@@ -1,8 +1,6 @@
 name: native-arm64-benchmark
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 jobs:
   benchmark:
     runs-on: ubuntu-24.04-arm
@@ -26,6 +24,7 @@ jobs:
           python -m pip install --only-binary=:all: --no-build-isolation -e .
           python scripts/fetch_model.py
       - name: Build pinned llama.cpp with KleidiAI
+        id: llama-build
         run: |
           git clone --depth 1 --branch b9623 https://github.com/ggml-org/llama.cpp.git third_party/llama.cpp
           cmake -S third_party/llama.cpp -B third_party/llama.cpp/build -DGGML_CPU_KLEIDIAI=ON -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
