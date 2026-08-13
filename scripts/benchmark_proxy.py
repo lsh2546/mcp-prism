@@ -29,7 +29,9 @@ def request_once(url: str, row: dict[str, Any], mode: str, cache: bool) -> dict[
         "temperature": 0,
         "top_p": 1,
         "seed": 42,
-        "max_tokens": 96,
+        # Performance path measures prefill and TTFT only. Full tool-call generations
+        # are evaluated separately so decode time cannot obscure the prefill effect.
+        "max_tokens": 1,
         "stream": True,
         "stream_options": {"include_usage": True},
     }
