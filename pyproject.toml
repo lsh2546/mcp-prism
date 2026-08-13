@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-prism"
+version = "0.1.0"
+description = "Adaptive MCP tool routing and prefix compilation for Arm64 LLM inference"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+dependencies = [
+  "numpy>=1.26,<3",
+  "onnxruntime>=1.19,<2",
+  "tokenizers>=0.20,<1",
+]
+
+[project.scripts]
+mcp-prism = "mcp_prism.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
