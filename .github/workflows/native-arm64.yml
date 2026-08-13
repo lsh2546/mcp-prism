@@ -25,9 +25,7 @@ jobs:
           python scripts/fetch_model.py
       - name: Build pinned llama.cpp with KleidiAI
         run: |
-          git clone --filter=blob:none https://github.com/ggml-org/llama.cpp.git third_party/llama.cpp
-          git -C third_party/llama.cpp fetch --depth 1 origin 341babc
-          git -C third_party/llama.cpp checkout FETCH_HEAD
+          git clone --depth 1 --branch b9623 https://github.com/ggml-org/llama.cpp.git third_party/llama.cpp
           cmake -S third_party/llama.cpp -B third_party/llama.cpp/build -DGGML_CPU_KLEIDIAI=ON -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
           cmake --build third_party/llama.cpp/build --config Release -j2 --target llama-server
           git -C third_party/llama.cpp rev-parse HEAD | tee results/arm64/llama-cpp-sha.txt
