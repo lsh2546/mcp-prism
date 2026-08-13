@@ -6,47 +6,70 @@
   {"server":"gmail","name":"reply_thread","description":"Reply to an existing Gmail thread while preserving conversation context.","input_schema":{"type":"object","properties":{"thread_id":{"type":"string"},"body":{"type":"string"}},"required":["thread_id","body"]}},
   {"server":"gmail","name":"modify_labels","description":"Add or remove Gmail labels from selected messages without changing content.","input_schema":{"type":"object","properties":{"message_ids":{"type":"array"},"add":{"type":"array"},"remove":{"type":"array"}},"required":["message_ids"]}},
 
-  {"server":"calendar","name":"search_events","description":"Find calendar e…49036 tokens truncated…, required
+  {"server":"calendar","name":"search_events","description":"Find calendar events by text, attendee, organizer, and time range.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"start":{"type":"string"},"end":{"type":"string"}},"required":["start","end"]}},
+  {"server":"calendar","name":"get_event","description":"Retrieve full details for one calendar event identifier.","input_schema":{"type":"object","properties":{"event_id":{"type":"string"}},"required":["event_id"]}},
+  {"server":"calendar","name":"create_event","description":"Create a calendar meeting with time, attendees, location, and conferencing options.","input_schema":{"type":"object","properties":{"title":{"type":"string"},"start":{"type":"string"},"end":{"type":"string"},"attendees":{"type":"array"}},"required":["title","start","end"]}},
+  {"server":"calendar","name":"update_event","description":"Change time, attendees, title, or location of an existing calendar event.","input_schema":{"type":"object","properties":{"event_id":{"type":"string"},"changes":{"type":"object"}},"required":["event_id","changes"]}},
+  {"server":"calendar","name":"delete_event","description":"Cancel and remove a calendar event, optionally notifying attendees.","input_schema":{"type":"object","properties":{"event_id":{"type":"string"},"notify":{"type":"boolean"}},"required":["event_id"]}},
+  {"server":"calendar","name":"find_free_time","description":"Find mutual free time across several calendars for a requested duration.","input_schema":{"type":"object","properties":{"attendees":{"type":"array"},"duration_minutes":{"type":"integer"},"range":{"type":"object"}},"required":["attendees","duration_minutes","range"]}},
 
+  {"server":"github","name":"search_code","description":"Search source code across GitHub repositories using code qualifiers.","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"]}},
+  {"server":"github","name":"search_issues","description":"Search GitHub issues and pull requests by repository, author, state, label, and text.","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"]}},
+  {"server":"github","name":"get_issue","description":"Read one GitHub issue including body, labels, state, and comments.","input_schema":{"type":"object","properties":{"repo":{"type":"string"},"number":{"type":"integer"}},"required":["repo","number"]}},
+  {"server":"github","name":"create_issue","description":"Create a new GitHub issue with title, body, labels, and assignees.","input_schema":{"type":"object","properties":{"repo":{"type":"string"},"title":{"type":"string"},"body":{"type":"string"}},"required":["repo","title"]}},
+  {"server":"github","name":"create_pull_request","description":"Open a GitHub pull request from a head branch into a base branch.","input_schema":{"type":"object","properties":{"repo":{"type":"string"},"head":{"type":"string"},"base":{"type":"string"},"title":{"type":"string"}},"required":["repo","head","base","title"]}},
+  {"server":"github","name":"list_workflow_runs","description":"List GitHub Actions workflow runs and filter by branch, status, or event.","input_schema":{"type":"object","properties":{"repo":{"type":"string"},"workflow":{"type":"string"},"status":{"type":"string"}},"required":["repo"]}},
+  {"server":"github","name":"get_workflow_logs","description":"Download or inspect logs from a specific GitHub Actions run.","input_schema":{"type":"object","properties":{"repo":{"type":"string"},"run_id":{"type":"integer"}},"required":["repo","run_id"]}},
+  {"server":"github","name":"read_file","description":"Read a file from a GitHub repository at a branch, tag, or commit.","input_schema":{"type":"object","properties":{"repo":{"type":"string"},"path":{"type":"string"},"ref":{"type":"string"}},"required":["repo","path"]}},
 
-def retrieval_document(tool: ToolDefinition) -> str:
-    names, descriptions, required = schema_fields(tool.input_schema)
-    return "\n".join(
-        [
-            f"tool identity: {tool.server} {tool.name.replace('_', ' ')}",
-            f"capability: {tool.description}",
-            f"input names: {names}",
-            f"input meanings: {descriptions}",
-            f"required inputs: {required}",
-        ]
-    )
+  {"server":"slack","name":"search_messages","description":"Search Slack messages across channels and direct conversations.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"channel":{"type":"string"}},"required":["query"]}},
+  {"server":"slack","name":"read_thread","description":"Read all replies in a Slack thread from a channel and root timestamp.","input_schema":{"type":"object","properties":{"channel":{"type":"string"},"thread_ts":{"type":"string"}},"required":["channel","thread_ts"]}},
+  {"server":"slack","name":"post_message","description":"Post a new message to a Slack channel or direct conversation.","input_schema":{"type":"object","properties":{"channel":{"type":"string"},"text":{"type":"string"}},"required":["channel","text"]}},
+  {"server":"slack","name":"reply_thread","description":"Reply inside an existing Slack message thread.","input_schema":{"type":"object","properties":{"channel":{"type":"string"},"thread_ts":{"type":"string"},"text":{"type":"string"}},"required":["channel","thread_ts","text"]}},
+  {"server":"slack","name":"add_reaction","description":"Add an emoji reaction to a Slack message.","input_schema":{"type":"object","properties":{"channel":{"type":"string"},"timestamp":{"type":"string"},"emoji":{"type":"string"}},"required":["channel","timestamp","emoji"]}},
+  {"server":"slack","name":"upload_file","description":"Upload a file and optionally share it in a Slack channel.","input_schema":{"type":"object","properties":{"channel":{"type":"string"},"path":{"type":"string"},"comment":{"type":"string"}},"required":["path"]}},
 
+  {"server":"database","name":"query_readonly","description":"Execute a parameterized read-only SQL SELECT query against an application database.","input_schema":{"type":"object","properties":{"database":{"type":"string"},"sql":{"type":"string"},"parameters":{"type":"array"}},"required":["database","sql"]}},
+  {"server":"database","name":"execute_write","description":"Execute a parameterized INSERT, UPDATE, or DELETE transaction in a database.","input_schema":{"type":"object","properties":{"database":{"type":"string"},"sql":{"type":"string"},"parameters":{"type":"array"}},"required":["database","sql"]}},
+  {"server":"database","name":"describe_schema","description":"List database tables, columns, types, constraints, and relationships.","input_schema":{"type":"object","properties":{"database":{"type":"string"},"table":{"type":"string"}},"required":["database"]}},
+  {"server":"database","name":"explain_query","description":"Return the database query plan without executing a data-changing statement.","input_schema":{"type":"object","properties":{"database":{"type":"string"},"sql":{"type":"string"}},"required":["database","sql"]}},
+  {"server":"database","name":"backup_table","description":"Create a timestamped backup snapshot of a database table.","input_schema":{"type":"object","properties":{"database":{"type":"string"},"table":{"type":"string"}},"required":["database","table"]}},
 
-@dataclass
-class SemanticToolIndex:
-    tools: tuple[ToolDefinition, ...]
-    matrix: np.ndarray
-    encoder: Int8OnnxEncoder
+  {"server":"search","name":"web_search","description":"Search the public web for current pages and information.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"recency_days":{"type":"integer"}},"required":["query"]}},
+  {"server":"search","name":"news_search","description":"Search recent news articles with publication date and source filters.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"start_date":{"type":"string"}},"required":["query"]}},
+  {"server":"search","name":"image_search","description":"Search for images using subject, license, and domain filters.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"license":{"type":"string"}},"required":["query"]}},
+  {"server":"search","name":"academic_search","description":"Search scholarly papers by topic, author, venue, and publication year.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"year_from":{"type":"integer"}},"required":["query"]}},
+  {"server":"search","name":"company_search","description":"Find company profiles, websites, industries, and headquarters.","input_schema":{"type":"object","properties":{"name":{"type":"string"},"industry":{"type":"string"}},"required":["name"]}},
 
-    @classmethod
-    def build(cls, tools: Iterable[ToolDefinition], encoder: Int8OnnxEncoder) -> "SemanticToolIndex":
-        ordered = tuple(sorted(tools, key=lambda item: item.qualified_name))
-        if not ordered:
-            raise ValueError("at least one tool is required")
-        matrix = encoder.encode(retrieval_document(tool) for tool in ordered)
-        return cls(ordered, matrix, encoder)
+  {"server":"files","name":"search_files","description":"Search file names and indexed document content in connected storage.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"folder":{"type":"string"}},"required":["query"]}},
+  {"server":"files","name":"read_text","description":"Read text content from a known file path without modifying it.","input_schema":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}},
+  {"server":"files","name":"write_text","description":"Create or overwrite a text file at a specified path.","input_schema":{"type":"object","properties":{"path":{"type":"string"},"content":{"type":"string"}},"required":["path","content"]}},
+  {"server":"files","name":"move_file","description":"Move or rename a file from one path to another.","input_schema":{"type":"object","properties":{"source":{"type":"string"},"destination":{"type":"string"}},"required":["source","destination"]}},
+  {"server":"files","name":"delete_file","description":"Delete a specific file from connected storage.","input_schema":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}},
+  {"server":"files","name":"share_file","description":"Create or update a sharing link and access policy for a file.","input_schema":{"type":"object","properties":{"path":{"type":"string"},"role":{"type":"string"},"expires_at":{"type":"string"}},"required":["path","role"]}},
 
-    def rank(self, query: str) -> list[RankedTool]:
-        query_vector = self.encoder.encode([query])[0]
-        scores = self.matrix @ query_vector
-        indices = np.argsort(-scores, kind="stable")
-        return [RankedTool(self.tools[int(index)], float(scores[index])) for index in indices]
+  {"server":"weather","name":"current_conditions","description":"Get current weather conditions for a city or geographic coordinate.","input_schema":{"type":"object","properties":{"location":{"type":"string"}},"required":["location"]}},
+  {"server":"weather","name":"daily_forecast","description":"Get a multi-day weather forecast for a location starting on a date.","input_schema":{"type":"object","properties":{"location":{"type":"string"},"days":{"type":"integer"}},"required":["location"]}},
+  {"server":"weather","name":"weather_alerts","description":"List active severe weather warnings and advisories for a region.","input_schema":{"type":"object","properties":{"region":{"type":"string"}},"required":["region"]}},
 
-    def rank_many(self, queries: Iterable[str]) -> list[RankedTool]:
-        """Max-pool semantic evidence across decomposed request intents."""
-        values = [value.strip() for value in queries if value.strip()]
-        vectors = self.encoder.encode(values)
-        scores = vectors @ self.matrix.T
-        pooled = scores.max(axis=0)
-        indices = np.argsort(-pooled, kind="stable")
-        return [RankedTool(self.tools[int(index)], float(pooled[index])) for index in indices]
+  {"server":"maps","name":"geocode","description":"Convert an address or place name into latitude and longitude.","input_schema":{"type":"object","properties":{"address":{"type":"string"}},"required":["address"]}},
+  {"server":"maps","name":"route","description":"Calculate a driving, walking, cycling, or transit route between places.","input_schema":{"type":"object","properties":{"origin":{"type":"string"},"destination":{"type":"string"},"mode":{"type":"string"}},"required":["origin","destination"]}},
+  {"server":"maps","name":"nearby_places","description":"Find nearby businesses or places around a coordinate or address.","input_schema":{"type":"object","properties":{"location":{"type":"string"},"category":{"type":"string"}},"required":["location","category"]}},
+
+  {"server":"tasks","name":"search_tasks","description":"Find tasks by project, assignee, status, due date, and text.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"project":{"type":"string"}},"required":["query"]}},
+  {"server":"tasks","name":"create_task","description":"Create a project task with assignee, due date, priority, and description.","input_schema":{"type":"object","properties":{"title":{"type":"string"},"project":{"type":"string"},"assignee":{"type":"string"},"due_date":{"type":"string"}},"required":["title","project"]}},
+  {"server":"tasks","name":"update_task","description":"Change status, assignee, due date, priority, or description of an existing task.","input_schema":{"type":"object","properties":{"task_id":{"type":"string"},"changes":{"type":"object"}},"required":["task_id","changes"]}},
+  {"server":"tasks","name":"comment_task","description":"Add a comment or progress note to an existing project task.","input_schema":{"type":"object","properties":{"task_id":{"type":"string"},"comment":{"type":"string"}},"required":["task_id","comment"]}},
+
+  {"server":"contacts","name":"search_contacts","description":"Find people or organizations by name, email, phone number, or company.","input_schema":{"type":"object","properties":{"query":{"type":"string"}},"required":["query"]}},
+  {"server":"contacts","name":"create_contact","description":"Create a contact with name, email, phone number, and organization.","input_schema":{"type":"object","properties":{"name":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"}},"required":["name"]}},
+  {"server":"contacts","name":"update_contact","description":"Update fields for an existing contact record.","input_schema":{"type":"object","properties":{"contact_id":{"type":"string"},"changes":{"type":"object"}},"required":["contact_id","changes"]}},
+
+  {"server":"commerce","name":"search_orders","description":"Search customer orders by buyer, status, date, product, or order number.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"status":{"type":"string"}},"required":["query"]}},
+  {"server":"commerce","name":"get_inventory","description":"Read available and reserved inventory for a product or warehouse.","input_schema":{"type":"object","properties":{"sku":{"type":"string"},"warehouse":{"type":"string"}},"required":["sku"]}},
+  {"server":"commerce","name":"refund_order","description":"Issue a full or partial refund for an existing customer order.","input_schema":{"type":"object","properties":{"order_id":{"type":"string"},"amount":{"type":"number"},"reason":{"type":"string"}},"required":["order_id","reason"]}},
+
+  {"server":"monitoring","name":"search_logs","description":"Search application logs by service, level, trace, time window, and text.","input_schema":{"type":"object","properties":{"query":{"type":"string"},"service":{"type":"string"},"start":{"type":"string"},"end":{"type":"string"}},"required":["query"]}},
+  {"server":"monitoring","name":"get_metrics","description":"Query time-series service metrics such as CPU, memory, latency, and error rate.","input_schema":{"type":"object","properties":{"metric":{"type":"string"},"service":{"type":"string"},"range":{"type":"string"}},"required":["metric","service"]}},
+  {"server":"monitoring","name":"create_alert","description":"Create an operational alert rule from a metric threshold and notification target.","input_schema":{"type":"object","properties":{"metric":{"type":"string"},"threshold":{"type":"number"},"channel":{"type":"string"}},"required":["metric","threshold","channel"]}}
+]
