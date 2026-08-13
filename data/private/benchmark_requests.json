@@ -1,11 +1,11 @@
 [
-  {"id":"a01","workload":"A-common-prefix","query":"What is tomorrow's weather in Seoul?"},
-  {"id":"a02","workload":"A-common-prefix","query":"Search my inbox for the newest invoice from Acme."},
-  {"id":"a03","workload":"A-common-prefix","query":"List failed GitHub CI runs for the prism repository."},
-  {"id":"b01","workload":"B-mixed-realistic","query":"Find the failed GitHub workflow, read its logs, and post a concise cause to Slack #engineering."},
-  {"id":"b02","workload":"B-mixed-realistic","query":"Find the launch PDF, create a share link, and email it to Mina."},
-  {"id":"b03","workload":"B-mixed-realistic","query":"Find tomorrow's design review and send its time to the project Slack channel."},
-  {"id":"c01","workload":"C-adversarial-low-share","query":"Compare current CPU alerts with the latest incident discussion and attach the relevant repository issue."},
-  {"id":"c02","workload":"C-adversarial-low-share","query":"Check the order referenced by the newest support email and refund it only if it is still eligible."},
-  {"id":"c03","workload":"C-adversarial-low-share","query":"Summarize this paragraph without calling any external tool: Arm processors use a RISC instruction set."}
+  {"id":"a01","workload":"A-common-prefix","query":"What is tomorrow's weather in Seoul?","expected":["weather.daily_forecast"]},
+  {"id":"a02","workload":"A-common-prefix","query":"Search my inbox for the newest invoice from Acme.","expected":["gmail.search_messages"]},
+  {"id":"a03","workload":"A-common-prefix","query":"List failed GitHub CI runs for the prism repository.","expected":["github.list_workflow_runs"]},
+  {"id":"b01","workload":"B-mixed-realistic","query":"Find the failed GitHub workflow, read its logs, and post a concise cause to Slack #engineering.","expected":["github.list_workflow_runs"]},
+  {"id":"b02","workload":"B-mixed-realistic","query":"Find the launch PDF, create a share link, and email it to Mina.","expected":["files.search_files"]},
+  {"id":"b03","workload":"B-mixed-realistic","query":"Find tomorrow's design review and send its time to the project Slack channel.","expected":["calendar.search_events"]},
+  {"id":"c01","workload":"C-adversarial-low-share","query":"Compare current CPU alerts with the latest incident discussion and attach the relevant repository issue.","expected":["monitoring.list_alerts"]},
+  {"id":"c02","workload":"C-adversarial-low-share","query":"Check the order referenced by the newest support email and refund it only if it is still eligible.","expected":["gmail.search_messages"]},
+  {"id":"c03","workload":"C-adversarial-low-share","query":"Summarize this paragraph without calling any external tool: Arm processors use a RISC instruction set.","expected":[]}
 ]
