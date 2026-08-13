@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.py[cod]
+models/*.onnx
+models/*.gguf
+models/tokenizer.json
+wheels/
+third_party/
+results/arm64/*.log

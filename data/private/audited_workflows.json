@@ -1,0 +1,10 @@
+[
+  {"id":"p01","required":["weather.daily_forecast"],"conditional":[],"one_of":[],"clarify":false},
+  {"id":"p13","required":["github.list_workflow_runs","github.get_workflow_logs","slack.post_message"],"edges":[["github.list_workflow_runs","github.get_workflow_logs"],["github.get_workflow_logs","slack.post_message"]],"clarify":false},
+  {"id":"p15","required":["gmail.search_messages","commerce.refund_order"],"conditional":["commerce.search_orders"],"edges":[["gmail.search_messages","commerce.refund_order"]],"clarify":false},
+  {"id":"p16","required":["files.search_files","files.share_file","gmail.send_message"],"edges":[["files.search_files","files.share_file"],["files.share_file","gmail.send_message"]],"clarify":false},
+  {"id":"p23","required":[],"one_of":[["gmail.search_messages"],["slack.search_messages"]],"clarify":true},
+  {"id":"p24","required":[],"one_of":[["github.search_issues"],["slack.search_messages"]],"clarify":true,"catalog_gap":"incident management service absent"},
+  {"id":"p25","required":["calendar.search_events"],"conditional":["calendar.get_event"],"clarify":false},
+  {"id":"p29","required":["files.move_file"],"conditional":[],"one_of":[],"clarify":false}
+]

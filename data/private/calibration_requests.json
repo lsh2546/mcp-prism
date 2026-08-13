@@ -1,0 +1,22 @@
+[
+  {"query":"Search my inbox for the invoice from Acme.","needs_tool":true},
+  {"query":"Send the approved proposal to the customer.","needs_tool":true},
+  {"query":"Schedule a meeting with the design team next week.","needs_tool":true},
+  {"query":"Check current memory utilization for the API service.","needs_tool":true},
+  {"query":"Find the latest failed workflow on GitHub.","needs_tool":true},
+  {"query":"Post this announcement to the engineering Slack channel.","needs_tool":true},
+  {"query":"Look up the customer's outstanding order.","needs_tool":true},
+  {"query":"Read the deployment runbook from connected storage.","needs_tool":true},
+  {"query":"Show the forecast for Busan this weekend.","needs_tool":true},
+  {"query":"Find a route from the airport to the hotel.","needs_tool":true},
+  {"query":"Explain what an API gateway does.","needs_tool":false},
+  {"query":"Rewrite this paragraph in a friendly tone.","needs_tool":false},
+  {"query":"Summarize the text I pasted below.","needs_tool":false},
+  {"query":"Brainstorm five names for a developer tool.","needs_tool":false},
+  {"query":"Calculate 144 divided by twelve.","needs_tool":false},
+  {"query":"Translate this sentence into Korean.","needs_tool":false},
+  {"query":"Explain p95 latency to a beginner.","needs_tool":false},
+  {"query":"Write a short thank-you note without sending it.","needs_tool":false},
+  {"query":"Compare queues and stacks conceptually.","needs_tool":false},
+  {"query":"Fix the grammar in this sentence.","needs_tool":false}
+]

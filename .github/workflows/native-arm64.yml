@@ -1,0 +1,48 @@
+name: native-arm64-benchmark
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  benchmark:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Record native host
+        run: |
+          mkdir -p results/arm64
+          { uname -a; uname -m; lscpu; free -h; } | tee results/arm64/host.txt
+          test "$(uname -m)" = "aarch64"
+      - name: Install MCP Prism
+        run: |
+          python -m pip install --only-binary=:all: --no-build-isolation -e .
+          python scripts/fetch_model.py
+      - name: Build pinned llama.cpp with KleidiAI
+        run: |
+          git clone --filter=blob:none https://github.com/ggml-org/llama.cpp.git third_party/llama.cpp
+          git -C third_party/llama.cpp fetch --depth 1 origin 341babc
+          git -C third_party/llama.cpp checkout FETCH_HEAD
+          cmake -S third_party/llama.cpp -B third_party/llama.cpp/build -DGGML_CPU_KLEIDIAI=ON -DLLAMA_CURL=OFF -DCMAKE_BUILD_TYPE=Release
+          cmake --build third_party/llama.cpp/build --config Release -j2 --target llama-server
+          git -C third_party/llama.cpp rev-parse HEAD | tee results/arm64/llama-cpp-sha.txt
+      - name: Download pinned official Qwen GGUF
+        run: |
+          curl -fL --retry 4 -o models/qwen2.5-1.5b-instruct-q4_k_m.gguf https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/62a8d092b0a1047016f3edbd0fde387598727aa5/qwen2.5-1.5b-instruct-q4_k_m.gguf
+          sha256sum models/qwen2.5-1.5b-instruct-q4_k_m.gguf | tee results/arm64/llm-sha256.txt
+      - name: Run server, proxy, and alternating benchmark
+        run: |
+          third_party/llama.cpp/build/bin/llama-server -m models/qwen2.5-1.5b-instruct-q4_k_m.gguf --host 127.0.0.1 --port 8080 -c 16384 -t 4 --jinja > results/arm64/llama-server.log 2>&1 &
+          for i in $(seq 1 120); do curl -fsS http://127.0.0.1:8080/health && break; sleep 1; done
+          python -m mcp_prism.cli proxy --host 127.0.0.1 --port 8090 --upstream http://127.0.0.1:8080 > results/arm64/prism.log 2>&1 &
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8090/health && break; sleep 1; done
+          python scripts/benchmark_proxy.py --out results/arm64/raw.json --repetitions 5 --warmup 2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-arm64-results
+          path: results/arm64
+          if-no-files-found: error
