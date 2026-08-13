@@ -102,6 +102,12 @@ def main() -> None:
     parser.add_argument("--warmup", type=int, default=2)
     args = parser.parse_args()
     cases = json.loads(args.data.read_text(encoding="utf-8"))
+    # One fixed representative per workload, repeated independently, gives a
+    # meaningful p95 without mixing workload classes or paying decode cost.
+    representatives = {}
+    for case in cases:
+        representatives.setdefault(case["workload"], case)
+    cases = list(representatives.values())
     rows: list[dict[str, Any]] = []
     schedule = [(mode, cache) for cache in (False, True) for mode in ("baseline", "prism")]
     for i in range(args.warmup + args.repetitions):
