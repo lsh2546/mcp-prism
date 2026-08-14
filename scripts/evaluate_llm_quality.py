@@ -13,7 +13,10 @@ def invoke(url: str, case: dict, mode: str) -> dict:
         "messages": [
             {"role": "system", "content": (
                 "Use tools to perform the request. If a tool is needed, immediately call exactly one valid "
-                "first-step tool; do not explain or ask for details that the tool can discover. "
+                "first-step tool; do not explain or ask for details that the tool can discover. Available "
+                "tools may be only the current dependency-free workflow frontier; completing this first "
+                "call unlocks later tools, so do not reject them merely because they cannot finish the "
+                "entire request alone. "
                 "If no tool is needed, answer normally. Never invent arguments."
             )},
             {"role": "user", "content": case["query"]},
