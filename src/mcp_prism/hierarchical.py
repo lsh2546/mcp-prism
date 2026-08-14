@@ -49,12 +49,14 @@ SERVICE_CUES = {
     "slack": {"slack", "channel", "thread", "discussion", "conversation"},
     "github": {"github", "repository", "repo", "ci", "workflow", "pull", "issue", "branch"},
     "calendar": {"calendar", "meeting", "appointment", "attendee"},
-    "files": {"file", "folder", "document", "pdf", "path", "storage"},
+    "files": {"file", "files", "folder", "document", "pdf", "path", "storage", "attachment"},
     "database": {"database", "sql", "table", "query"},
     "search": {"web", "news", "paper", "academic", "image"},
     "commerce": {"order", "inventory", "sku", "refund", "customer"},
     "monitoring": {"production", "service", "metric", "cpu", "memory", "error", "incident", "logs"},
     "tasks": {"task", "project", "assignee", "due"},
+    "weather": {"weather", "forecast", "temperature", "conditions"},
+    "maps": {"map", "address", "geocode", "route", "driving", "nearby"},
 }
 
 TOOL_CUES = {
@@ -70,6 +72,29 @@ TOOL_CUES = {
     "gmail.send_message": {"email", "send", "mail"},
     "slack.post_message": {"post", "send", "slack", "channel"},
     "slack.search_messages": {"search", "find", "latest", "discussion", "conversation"},
+    "slack.upload_file": {"upload", "file", "attachment"},
+    "gmail.reply_thread": {"reply", "respond", "thread"},
+    "calendar.find_free_time": {"free", "slot", "availability", "available", "hour"},
+    "calendar.create_event": {"create", "event", "schedule", "invite"},
+    "files.read_text": {"open", "read", "text", "path"},
+    "files.write_text": {"save", "write", "text", "summary"},
+    "database.describe_schema": {"describe", "schema", "columns", "tables"},
+    "database.query_readonly": {"query", "rows", "select", "read-only", "readonly"},
+    "maps.geocode": {"geocode", "address", "coordinates"},
+    "maps.route": {"route", "driving", "directions", "from"},
+    "gmail.create_draft": {"draft", "compose", "email"},
+    "gmail.modify_labels": {"label", "archive", "mark"},
+    "github.read_file": {"read", "file", "path", "repository"},
+    "database.explain_query": {"explain", "plan", "query"},
+    "files.move_file": {"move", "rename", "folder", "path"},
+    "tasks.create_task": {"create", "task", "todo", "track"},
+    "tasks.update_task": {"update", "task", "status", "due"},
+    "contacts.search_contacts": {"find", "contact", "address", "person"},
+    "calendar.update_event": {"update", "reschedule", "event", "meeting"},
+    "search.academic_search": {"academic", "paper", "research", "study"},
+    "monitoring.create_alert": {"create", "alert", "threshold", "notify"},
+    "commerce.search_orders": {"find", "search", "order", "customer"},
+    "maps.nearby_places": {"nearby", "place", "around", "closest"},
 }
 
 NO_TOOL_PATTERNS = (
@@ -121,10 +146,15 @@ class HierarchicalRouter:
         vector = self.index.encoder.encode([text])[0]
         scores = self.domain_vectors @ vector
         order = np.argsort(-scores, kind="stable")
+        query_words = words(text)
         explicit = [
             domain
             for domain, servers in DOMAIN_SERVERS.items()
-            if any(server.lower() in words(text) for server in servers)
+            if any(
+                server.lower() in query_words
+                or bool(query_words & SERVICE_CUES.get(server, set()))
+                for server in servers
+            )
         ]
         lowered = text.lower()
         if any(cue in lowered for cue in ("meeting", "design review", "appointment", "calendar event")):
@@ -133,7 +163,10 @@ class HierarchicalRouter:
             explicit.insert(0, "communication")
         if any(cue in lowered for cue in ("tomorrow's weather", "weather tomorrow", "forecast")):
             explicit.insert(0, "web")
-        values = list(dict.fromkeys(explicit + [self.domain_names[int(i)] for i in order[: self.domain_k]]))
+        # An explicit service or domain cue is stronger than embedding-neighbor
+        # domains. Adding semantic domains in that case caused cross-service
+        # substitutions such as Gmail read for a connected-storage path.
+        values = list(dict.fromkeys(explicit or [self.domain_names[int(i)] for i in order[: self.domain_k]]))
         return tuple(values)
 
     def hybrid_score(self, task: str, item: RankedTool) -> float:
@@ -194,6 +227,13 @@ class HierarchicalRouter:
             domains = self.infer_domains(piece)
             allowed = set().union(*(DOMAIN_SERVERS[domain] for domain in domains))
             pool = [item for item in candidates if item.tool.server in allowed] or list(candidates)
+            # A possessive continuation such as "read its logs" inherits the
+            # service of the source object unless the clause names another
+            # service explicitly.
+            if plan and re.search(r"\b(?:read|open|inspect)\b.*\bits\b", piece, re.IGNORECASE):
+                inherited = [item for item in candidates if item.tool.server == plan[-1].tool.server]
+                if inherited:
+                    pool = inherited
             ranked = sorted(
                 pool,
                 key=lambda item: (-self.hybrid_score(piece, item), item.tool.qualified_name),
