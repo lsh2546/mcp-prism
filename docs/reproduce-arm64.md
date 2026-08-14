@@ -12,9 +12,9 @@ Performance and quality are deliberately separate:
 
 The performance schedule alternates Baseline and Prism order. It uses two warmups and seven recorded repetitions per workload with `cache_prompt` enabled. Workloads remain separate:
 
-1. A ??long common MCP prefix;
-2. B ??mixed realistic tool bundles;
-3. C ??low-sharing adversarial requests.
+1. A — long common MCP prefix;
+2. B — mixed realistic tool bundles;
+3. C — low-sharing adversarial requests.
 
 ## Native host and pinned software
 
