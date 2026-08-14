@@ -16,7 +16,7 @@ def invoke(url: str, case: dict, mode: str) -> dict:
         "temperature": 0, "top_p": 1, "seed": 42, "max_tokens": 96, "stream": False,
     }
     request = urllib.request.Request(url, data=json.dumps(payload).encode(), method="POST", headers={
-        "content-type": "application/json", "x-mcp-prism-mode": mode, "x-mcp-prism-cache": "off",
+        "content-type": "application/json", "x-mcp-prism-mode": mode, "x-mcp-prism-cache": "on",
     })
     with urllib.request.urlopen(request, timeout=600) as response:
         result = json.load(response)
@@ -68,7 +68,7 @@ def main() -> None:
         "wrong_tool_noninferior": prism["wrong_first_tool_rate"] <= baseline["wrong_first_tool_rate"],
     }
     args.out.write_text(json.dumps({"raw": rows, "summary": summary, "gates": gates}, indent=2), encoding="utf-8")
-    print(json.dumps({"summary": summary, "gates": gates}, indent=2))
+    print(json.dumps({"raw": rows, "summary": summary, "gates": gates}, indent=2))
     if not all(gates.values()):
         raise SystemExit("quality gate failed")
 
