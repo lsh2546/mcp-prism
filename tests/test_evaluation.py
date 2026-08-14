@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.3 seconds
-Output:
 from mcp_prism.evaluation import CasePrediction, EvaluationCase, quality_gate, score_cases
 
 
