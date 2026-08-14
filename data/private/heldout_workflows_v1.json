@@ -1,0 +1,24 @@
+
+[
+  {"id":"h01","category":"single-explicit","query":"Show the current weather conditions in Busan.","workflow":["weather.current_conditions"]},
+  {"id":"h02","category":"single-explicit","query":"Search Slack for the latest discussion mentioning Project Orion.","workflow":["slack.search_messages"]},
+  {"id":"h03","category":"single-explicit","query":"Find open GitHub issues about memory leaks in the nebula repository.","workflow":["github.search_issues"]},
+  {"id":"h04","category":"single-implicit","query":"Read rows from the customers table where the plan is enterprise.","workflow":["database.query_readonly"]},
+  {"id":"h05","category":"single-implicit","query":"Open and read /reports/q3-summary.txt from connected storage.","workflow":["files.read_text"]},
+  {"id":"h06","category":"single-explicit","query":"Find a free hour on Hana's calendar next Thursday afternoon.","workflow":["calendar.find_free_time"]},
+  {"id":"h07","category":"multi-sequential","query":"Search GitHub for the Atlas login bug and post the matching issue to Slack #triage.","workflow":["github.search_issues","slack.post_message"]},
+  {"id":"h08","category":"multi-sequential","query":"Locate the newest Gmail thread from Northwind and reply that the contract was received.","workflow":["gmail.search_messages","gmail.reply_thread"]},
+  {"id":"h09","category":"multi-sequential","query":"Describe the billing database schema, then run a read-only query for overdue invoices.","workflow":["database.describe_schema","database.query_readonly"]},
+  {"id":"h10","category":"multi-cross-service","query":"Search the web for the Arm developer summit date and create a project task to register.","workflow":["search.web_search","tasks.create_task"]},
+  {"id":"h11","category":"multi-sequential","query":"Search production logs for repeated authentication failures and create a monitoring alert for them.","workflow":["monitoring.search_logs","monitoring.create_alert"]},
+  {"id":"h12","category":"multi-cross-service","query":"Find the brand-guide PDF in storage and upload it to the Slack design channel.","workflow":["files.search_files","slack.upload_file"]},
+  {"id":"h13","category":"multi-sequential","query":"Find a free slot for Kai and Yuna tomorrow, then create a calendar event called roadmap sync.","workflow":["calendar.find_free_time","calendar.create_event"]},
+  {"id":"h14","category":"multi-conditional","query":"Search for the pending order from customer Bluebird and refund it for duplicate payment.","workflow":["commerce.search_orders","commerce.refund_order"]},
+  {"id":"h15","category":"multi-sequential","query":"Geocode 1 Infinite Loop, Cupertino, then calculate a driving route there from San Jose airport.","workflow":["maps.geocode","maps.route"]},
+  {"id":"h16","category":"multi-cross-service","query":"Find the latest incident task assigned to Jisoo and add a concise status comment to it.","workflow":["tasks.search_tasks","tasks.comment_task"]},
+  {"id":"h17","category":"multi-cross-service","query":"Search my email for the quarterly forecast attachment and save its summary as a text file.","workflow":["gmail.search_messages","files.write_text"]},
+  {"id":"h18","category":"no-tool","query":"Without using any tool, explain in one sentence what a CPU cache is.","workflow":[]},
+  {"id":"h19","category":"no-tool","query":"Do not call any tool; rewrite this phrase more politely: Send it now.","workflow":[]},
+  {"id":"h20","category":"no-tool","query":"Answer without calling any external tool: what is two plus three?","workflow":[]}
+]
+
