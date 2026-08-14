@@ -26,7 +26,7 @@ def base(kicker: str, number: str):
     for x in range(0, W, 64): d.line((x, 0, x, H), fill="#0d1a16", width=1)
     for y in range(0, H, 64): d.line((0, y, W, y), fill="#0d1a16", width=1)
     d.text((90, 60), "MCP PRISM", font=font(28, True), fill=INK)
-    d.text((W - 390, 60), "??NATIVE ARM64", font=font(25, True), fill=LIME)
+    d.text((W - 390, 60), "● NATIVE ARM64", font=font(25, True), fill=LIME)
     d.text((90, 155), number, font=font(24, True), fill=LIME)
     d.text((155, 155), kicker.upper(), font=font(24, True), fill=CYAN)
     return im, d
@@ -40,7 +40,7 @@ def slide_hero(path):
     im, d = base("The MCP schema bottleneck, removed", "00")
     d.text((90, 255), "Fewer schemas.", font=font(112, True), fill=INK)
     d.text((90, 375), "Faster agents.", font=font(112, True), fill=LIME)
-    cards = [("8.80횞", "PEAK THROUGHPUT"), ("85% vs 60%", "WORKFLOW SUCCESS"), ("100%", "FIRST-STEP ACCURACY"), ("ARM64", "NEOVERSE-N2")]
+    cards = [("8.80×", "PEAK THROUGHPUT"), ("85% vs 60%", "WORKFLOW SUCCESS"), ("100%", "FIRST-STEP ACCURACY"), ("ARM64", "NEOVERSE-N2")]
     x = 90
     for value, label in cards:
         d.rounded_rectangle((x, 650, x + 410, 870), 10, fill=PANEL, outline="#2d3b35")
@@ -52,11 +52,11 @@ def slide_hero(path):
 
 def slide_problem(path):
     im, d = base("One request should not read sixty-one manuals", "01")
-    multiline(d, (90, 245), "Every connected MCP tool schema is serialized into the prompt?봢ven when the request needs only one tool.", 62, bold=True, width=48)
+    multiline(d, (90, 245), "Every connected MCP tool schema is serialized into the prompt—even when the request needs only one tool.", 62, bold=True, width=48)
     d.rounded_rectangle((90, 610, 1830, 870), 12, fill=PANEL, outline="#2d3b35")
-    d.text((135, 660), "?쏻hat is tomorrow?셲 weather in Seoul???, font=font(42, True), fill=CYAN)
-    d.text((135, 755), "BASELINE  61 schemas  쨌  4,891 tokens", font=font(32, True), fill=RED)
-    d.text((1030, 755), "PRISM  1 schema  쨌  185 tokens", font=font(32, True), fill=LIME)
+    d.text((135, 660), "“What is tomorrow’s weather in Seoul?”", font=font(42, True), fill=CYAN)
+    d.text((135, 755), "BASELINE  61 schemas  ·  4,891 tokens", font=font(32, True), fill=RED)
+    d.text((1030, 755), "PRISM  1 schema  ·  185 tokens", font=font(32, True), fill=LIME)
     im.save(path)
 
 
@@ -69,9 +69,9 @@ def slide_system(path):
         d.text((x + 30, 345), n, font=font(34, True), fill=LIME)
         d.text((x + 30, 440), title, font=font(28, True), fill=INK)
         multiline(d, (x + 30, 515), desc, 29, MUTED, width=20)
-        if n != "4": d.text((x + 405, 475), "??, font=font(46, True), fill=LIME)
+        if n != "4": d.text((x + 405, 475), "→", font=font(46, True), fill=LIME)
         x += 435
-    d.text((90, 800), "OpenAI-compatible gateway 쨌 existing agents change only the base URL", font=font(35, True), fill=CYAN)
+    d.text((90, 800), "OpenAI-compatible gateway · existing agents change only the base URL", font=font(35, True), fill=CYAN)
     im.save(path)
 
 
@@ -80,7 +80,7 @@ def slide_arm(path):
     d.rounded_rectangle((90, 245, 1830, 865), 12, fill="#050a08", outline="#30433a")
     console = [
         "$ uname -m", "aarch64", "$ lscpu | grep -E 'Model name|CPU\\(s\\)'", "CPU(s): 4", "Model name: Neoverse-N2",
-        "$ llama-server ... -t 4 --jinja", "llama.cpp b9623 쨌 GGML_CPU_KLEIDIAI=ON", "$ python scripts/benchmark_proxy.py --cache-only",
+        "$ llama-server ... -t 4 --jinja", "llama.cpp b9623 · GGML_CPU_KLEIDIAI=ON", "$ python scripts/benchmark_proxy.py --cache-only",
         "A-common-prefix          5.60x", "B-mixed-realistic       8.80x", "C-adversarial-low-share 7.49x", "PASS: every workload >= 3.00x"
     ]
     y = 285
@@ -88,7 +88,7 @@ def slide_arm(path):
         color = LIME if line.startswith(("aarch64", "A-", "B-", "C-", "PASS")) else (CYAN if line.startswith("$") else INK)
         d.text((135, y), line, font=font(28, line.startswith("PASS")), fill=color)
         y += 43
-    d.text((90, 920), "Public run #35 쨌 github.com/lsh2546/mcp-prism/actions/runs/31783556529", font=font(25, True), fill=MUTED)
+    d.text((90, 920), "Public run #35 · github.com/lsh2546/mcp-prism/actions/runs/31783556529", font=font(25, True), fill=MUTED)
     im.save(path)
 
 
@@ -101,17 +101,17 @@ def slide_quality(path):
     d.rounded_rectangle((910, 410, 1640, 760), 12, fill=PANEL, outline=LIME, width=4)
     d.text((965, 460), "MCP PRISM", font=font(24, True), fill=LIME)
     d.text((965, 545), "85%", font=font(112, True), fill=LIME)
-    d.text((90, 840), "100% first-step accuracy  쨌  0% wrong first calls  쨌  20 frozen held-out requests", font=font(29, True), fill=CYAN)
+    d.text((90, 840), "100% first-step accuracy  ·  0% wrong first calls  ·  20 frozen held-out requests", font=font(29, True), fill=CYAN)
     im.save(path)
 
 
 def slide_finish(path):
     im, d = base("Reusable Cloud AI infrastructure", "05")
     multiline(d, (90, 260), "MCP Prism removes wasted prefill before inference begins.", 76, bold=True, width=38)
-    d.text((90, 570), "8.80횞 faster.  85% workflow success.  Native Arm64.", font=font(40, True), fill=LIME)
+    d.text((90, 570), "8.80× faster.  85% workflow success.  Native Arm64.", font=font(40, True), fill=LIME)
     d.rounded_rectangle((90, 700, 1470, 830), 10, fill=PANEL, outline="#33423b")
     d.text((130, 742), "github.com/lsh2546/mcp-prism", font=font(42, True), fill=CYAN)
-    d.text((90, 920), "Apache-2.0 쨌 source, workflows, raw evidence and reproduction commands are public", font=font(25, True), fill=MUTED)
+    d.text((90, 920), "Apache-2.0 · source, workflows, raw evidence and reproduction commands are public", font=font(25, True), fill=MUTED)
     im.save(path)
 
 
