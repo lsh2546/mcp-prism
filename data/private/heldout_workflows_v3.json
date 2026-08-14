@@ -1,0 +1,24 @@
+
+[
+  {"id":"v301","category":"single-explicit","query":"Give me the seven-day weather forecast for Daegu.","workflow":["weather.daily_forecast"]},
+  {"id":"v302","category":"single-explicit","query":"Send a Gmail message to minseo@example.com with subject Demo and body Ready for review.","workflow":["gmail.send_message"]},
+  {"id":"v303","category":"single-explicit","query":"Delete the calendar event with identifier evt-9281.","workflow":["calendar.delete_event"]},
+  {"id":"v304","category":"single-explicit","query":"Create a GitHub issue in lunar/api titled Retry storm with a short bug description.","workflow":["github.create_issue"]},
+  {"id":"v305","category":"single-explicit","query":"Add a thumbs-up reaction to Slack message 1742.88 in channel C42.","workflow":["slack.add_reaction"]},
+  {"id":"v306","category":"single-implicit","query":"Back up the audit_events database table under the snapshot name pre-migration.","workflow":["database.backup_table"]},
+  {"id":"v307","category":"single-explicit","query":"Search current news for Arm server adoption in European cloud regions.","workflow":["search.news_search"]},
+  {"id":"v308","category":"single-explicit","query":"Create a viewer share link for /legal/nda-final.pdf in connected files.","workflow":["files.share_file"]},
+  {"id":"v309","category":"single-implicit","query":"Calculate a driving route from Incheon Airport to Pangyo Techno Valley.","workflow":["maps.route"]},
+  {"id":"v310","category":"single-explicit","query":"Get inventory for SKU ARM-N2-64 from warehouse east-2.","workflow":["commerce.get_inventory"]},
+  {"id":"v311","category":"multi-sequential","query":"Search GitHub code in stellar/web for the old auth flag and create a pull request replacing it.","workflow":["github.search_code","github.create_pull_request"]},
+  {"id":"v312","category":"multi-sequential","query":"Search Slack for the deployment freeze thread and reply in that Slack thread that the freeze is lifted.","workflow":["slack.search_messages","slack.reply_thread"]},
+  {"id":"v313","category":"multi-sequential","query":"Get memory metrics for image-worker from monitoring and create a monitoring alert above 90 percent.","workflow":["monitoring.get_metrics","monitoring.create_alert"]},
+  {"id":"v314","category":"multi-cross-service","query":"Find Yejin Park in contacts and send her a Gmail message asking for the vendor code.","workflow":["contacts.search_contacts","gmail.send_message"]},
+  {"id":"v315","category":"multi-sequential","query":"Search connected files for security-review.docx and create a viewer share link for that file.","workflow":["files.search_files","files.share_file"]},
+  {"id":"v316","category":"multi-sequential","query":"Search the calendar for the obsolete weekly demo and delete that calendar event.","workflow":["calendar.search_events","calendar.delete_event"]},
+  {"id":"v317","category":"multi-conditional","query":"Search commerce orders for customer Redwood and refund the duplicate order.","workflow":["commerce.search_orders","commerce.refund_order"]},
+  {"id":"v318","category":"no-tool","query":"Without calling any external tool, state the binary representation of decimal ten.","workflow":[]},
+  {"id":"v319","category":"no-tool","query":"Do not call any tool; shorten this sentence: The meeting was canceled because nobody was available.","workflow":[]},
+  {"id":"v320","category":"no-tool","query":"No external tool: name the three primary colors.","workflow":[]}
+]
+
