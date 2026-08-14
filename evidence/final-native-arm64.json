@@ -1,0 +1,52 @@
+
+{
+  "status": "all_final_gates_passed",
+  "frozen_at": "2026-08-14T08:25:13Z",
+  "platform": {
+    "architecture": "aarch64",
+    "cpu": "Arm Neoverse-N2",
+    "cores": 4,
+    "runner": "ubuntu-24.04-arm",
+    "llm": "Qwen2.5-1.5B-Instruct Q4_K_M",
+    "runtime": "llama.cpp b9623 with KleidiAI"
+  },
+  "quality": {
+    "development_first_step_accuracy": 1.0,
+    "development_wrong_first_call_rate": 0.0,
+    "heldout_v3_requests": 20,
+    "baseline_complete_workflow_success": 0.60,
+    "prism_complete_workflow_success": 0.85,
+    "run_url": "https://github.com/lsh2546/mcp-prism/actions/runs/31782960486"
+  },
+  "cache_on_performance": {
+    "A-common-prefix": {
+      "baseline_requests_per_s": 2.4130831643960917,
+      "prism_requests_per_s": 13.511508932483409,
+      "throughput_ratio": 5.599271973647396,
+      "baseline_p95_ttft_s": 0.4346164287999841,
+      "prism_p95_ttft_s": 0.0885014727000339,
+      "baseline_prompt_tokens": 4891,
+      "prism_prompt_tokens": 185
+    },
+    "B-mixed-realistic": {
+      "baseline_requests_per_s": 1.4206009639246913,
+      "prism_requests_per_s": 12.504847191389134,
+      "throughput_ratio": 8.802505072812297,
+      "baseline_p95_ttft_s": 0.716943225200032,
+      "prism_p95_ttft_s": 0.10040230750000205,
+      "baseline_prompt_tokens": 4903,
+      "prism_prompt_tokens": 207
+    },
+    "C-adversarial-low-share": {
+      "baseline_requests_per_s": 1.6467446564214994,
+      "prism_requests_per_s": 12.334425208957647,
+      "throughput_ratio": 7.490186873149652,
+      "baseline_p95_ttft_s": 0.6287514349999697,
+      "prism_p95_ttft_s": 0.09656732809997379,
+      "baseline_prompt_tokens": 4899,
+      "prism_prompt_tokens": 208
+    },
+    "run_url": "https://github.com/lsh2546/mcp-prism/actions/runs/31783556529"
+  }
+}
+
