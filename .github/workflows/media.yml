@@ -1,0 +1,35 @@
+
+name: build-submission-video
+on:
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install deterministic render dependencies
+        run: |
+          python -m pip install --only-binary=:all: pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg espeak-ng
+      - name: Render 2m25s narrated demo
+        run: |
+          python scripts/render_demo_video.py
+          espeak-ng -s 145 -f assets/video/narration.txt -w assets/video/narration.wav
+          ffmpeg -y -f concat -safe 0 -i assets/video/slides.txt -i assets/video/narration.wav \
+            -filter_complex "[1:a]apad[a]" -map 0:v -map "[a]" -t 145 \
+            -c:v libx264 -pix_fmt yuv420p -r 30 -c:a aac -b:a 128k \
+            -movflags +faststart assets/mcp-prism-demo.mp4
+          ffprobe -v error -show_entries format=duration -of default=nw=1 assets/mcp-prism-demo.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcp-prism-submission-video
+          path: |
+            assets/mcp-prism-demo.mp4
+            assets/video/slide-*.png
+          if-no-files-found: error
+
