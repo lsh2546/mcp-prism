@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import argparse
@@ -22,6 +23,7 @@ def invoke(url: str, case: dict, mode: str) -> dict:
         result = json.load(response)
         headers = dict(response.headers.items())
     message = result.get("choices", [{}])[0].get("message", {})
+    finish_reason = result.get("choices", [{}])[0].get("finish_reason")
     calls = message.get("tool_calls") or []
     selected = [call.get("function", {}).get("name") for call in calls if call.get("function", {}).get("name")]
     required = case.get("required_candidates", [])
@@ -32,6 +34,7 @@ def invoke(url: str, case: dict, mode: str) -> dict:
     return {"id": case["id"], "workload": case["workload"], "mode": mode,
             "required_candidates": required, "valid_first_tools": valid_first,
             "candidate_names": candidates, "selected": selected,
+            "content": message.get("content"), "finish_reason": finish_reason,
             "candidate_recall": set(required).issubset(candidates),
             "first_step_correct": (first in valid_first) if valid_first else (first is None),
             "no_tool_correct": (first is None) if no_tool else None,
