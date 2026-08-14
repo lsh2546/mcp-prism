@@ -176,3 +176,21 @@ class HierarchicalRouter:
         clarification = len(tasks) == 1 and len(tasks[0].domains) > 1 and max((item.score for item in candidates), default=0) < 0.45
         return HierarchicalDecision(tasks, candidates, clarification)
 
+
+def execution_frontier(query: str, candidates: tuple[RankedTool, ...]) -> tuple[RankedTool, ...]:
+    """Return tools whose inputs are available before any workflow result exists."""
+    lowered = query.lower()
+    sequenced = any(token in lowered for token in (" and ", " then ", ",", "referenced", "relevant", " its ", " it "))
+    if not sequenced:
+        return candidates
+
+    def independent(item: RankedTool) -> bool:
+        name = item.tool.name.lower()
+        return (
+            name.startswith(("search_", "list_", "find_"))
+            or name in {"current_conditions", "daily_forecast", "weather_alerts", "get_metrics", "geocode", "nearby_places", "route"}
+        )
+
+    frontier = tuple(item for item in candidates if independent(item))
+    return frontier or candidates
+
