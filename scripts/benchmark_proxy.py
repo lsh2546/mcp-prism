@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import argparse
@@ -100,6 +101,7 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--repetitions", type=int, default=5)
     parser.add_argument("--warmup", type=int, default=2)
+    parser.add_argument("--cache-only", action="store_true")
     args = parser.parse_args()
     cases = json.loads(args.data.read_text(encoding="utf-8"))
     # One fixed representative per workload, repeated independently, gives a
@@ -109,7 +111,8 @@ def main() -> None:
         representatives.setdefault(case["workload"], case)
     cases = list(representatives.values())
     rows: list[dict[str, Any]] = []
-    schedule = [(mode, cache) for cache in (False, True) for mode in ("baseline", "prism")]
+    cache_modes = (True,) if args.cache_only else (False, True)
+    schedule = [(mode, cache) for cache in cache_modes for mode in ("baseline", "prism")]
     for i in range(args.warmup + args.repetitions):
         for case_index, case in enumerate(cases):
             ordered = schedule if (i + case_index) % 2 == 0 else list(reversed(schedule))
