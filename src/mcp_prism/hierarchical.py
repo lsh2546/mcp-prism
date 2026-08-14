@@ -45,7 +45,7 @@ ACTION_ALIASES = {
 }
 
 SERVICE_CUES = {
-    "gmail": {"email", "inbox", "mail"},
+    "gmail": {"gmail", "email", "inbox", "mail"},
     "slack": {"slack", "channel", "thread", "discussion", "conversation"},
     "github": {"github", "repository", "repo", "ci", "workflow", "pull", "issue", "branch"},
     "calendar": {"calendar", "meeting", "appointment", "attendee"},
@@ -94,7 +94,10 @@ TOOL_CUES = {
     "search.academic_search": {"academic", "paper", "research", "study"},
     "monitoring.create_alert": {"create", "alert", "threshold", "notify"},
     "commerce.search_orders": {"find", "search", "order", "customer"},
+    "commerce.refund_order": {"refund", "return", "duplicate", "reason"},
     "maps.nearby_places": {"nearby", "place", "around", "closest"},
+    "monitoring.get_metrics": {"get", "metric", "metrics", "latency", "cpu", "memory"},
+    "slack.reply_thread": {"reply", "respond", "thread"},
 }
 
 NO_TOOL_PATTERNS = (
@@ -227,6 +230,15 @@ class HierarchicalRouter:
             domains = self.infer_domains(piece)
             allowed = set().union(*(DOMAIN_SERVERS[domain] for domain in domains))
             pool = [item for item in candidates if item.tool.server in allowed] or list(candidates)
+            piece_words = words(piece)
+            explicit_servers = {
+                server
+                for server, cues in SERVICE_CUES.items()
+                if (server != "search" and server in piece_words) or bool(piece_words & cues)
+            }
+            server_pool = [item for item in pool if item.tool.server in explicit_servers]
+            if server_pool:
+                pool = server_pool
             # A possessive continuation such as "read its logs" inherits the
             # service of the source object unless the clause names another
             # service explicitly.
