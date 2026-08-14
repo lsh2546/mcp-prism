@@ -77,8 +77,11 @@ class ProxyEngine:
                     clean_messages.append(message)
             if context:
                 clean_messages.append({
-                    "role": "assistant",
-                    "content": "Completed tool results:\n" + "\n".join(context),
+                    "role": "user",
+                    "content": (
+                        "Continue the original workflow using these completed tool results:\n"
+                        + "\n".join(context)
+                    ),
                 })
             payload["messages"] = clean_messages
         if mode == "prism" and tools:
