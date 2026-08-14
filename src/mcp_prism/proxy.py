@@ -10,7 +10,7 @@ from typing import Any
 
 from .canonical import canonical_tool_bundle, openai_tool
 from .encoder import EncoderConfig, Int8OnnxEncoder
-from .hierarchical import HierarchicalRouter
+from .hierarchical import HierarchicalRouter, execution_frontier
 from .index import SemanticToolIndex
 from .models import ToolDefinition
 
@@ -38,7 +38,8 @@ class ProxyEngine:
             tasks = 1
         elif mode == "prism":
             decision = self.router.route(str(query))
-            tools = [item.tool for item in decision.candidates]
+            retrieved = decision.candidates
+            tools = [item.tool for item in execution_frontier(str(query), retrieved)]
             fingerprint, encoded = canonical_tool_bundle(tools)
             tasks = len(decision.tasks)
         else:
@@ -52,7 +53,10 @@ class ProxyEngine:
             "x-mcp-prism-prefix": fingerprint,
             "x-mcp-prism-atomic-tasks": str(tasks),
             "x-mcp-prism-schema-chars": str(len(json.dumps(encoded, separators=(",", ":")))),
-            "x-mcp-prism-tool-names": ",".join(tool.qualified_name for tool in tools),
+            "x-mcp-prism-tool-names": (
+                ",".join(item.tool.qualified_name for item in retrieved)
+                if mode == "prism" else ",".join(tool.qualified_name for tool in tools)
+            ),
         }
 
 
