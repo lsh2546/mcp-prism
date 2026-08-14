@@ -11,7 +11,11 @@ def invoke(url: str, case: dict, mode: str) -> dict:
     payload = {
         "model": "mcp-prism",
         "messages": [
-            {"role": "system", "content": "Select the minimum tools needed. Never invent arguments."},
+            {"role": "system", "content": (
+                "Use tools to perform the request. If a tool is needed, immediately call exactly one valid "
+                "first-step tool; do not explain or ask for details that the tool can discover. "
+                "If no tool is needed, answer normally. Never invent arguments."
+            )},
             {"role": "user", "content": case["query"]},
         ],
         "temperature": 0, "top_p": 1, "seed": 42, "max_tokens": 96, "stream": False,
