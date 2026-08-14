@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.3 seconds
+Output:
 from __future__ import annotations
 
 import re
@@ -45,7 +48,7 @@ ACTION_ALIASES = {
 
 SERVICE_CUES = {
     "gmail": {"email", "inbox", "mail"},
-    "slack": {"slack", "channel", "thread"},
+    "slack": {"slack", "channel", "thread", "discussion", "conversation"},
     "github": {"github", "repository", "repo", "ci", "workflow", "pull", "issue", "branch"},
     "calendar": {"calendar", "meeting", "appointment", "attendee"},
     "files": {"file", "folder", "document", "pdf", "path", "storage"},
@@ -62,7 +65,20 @@ TOOL_CUES = {
     "gmail.search_messages": {"email", "inbox", "newest", "latest", "from"},
     "files.search_files": {"file", "pdf", "document", "storage", "find", "search"},
     "calendar.search_events": {"meeting", "changed", "check", "find"},
+    "weather.daily_forecast": {"tomorrow", "forecast", "daily", "week", "weekend"},
+    "weather.current_conditions": {"current", "currently", "now", "conditions"},
+    "files.share_file": {"share", "link", "access", "permission"},
+    "gmail.send_message": {"email", "send", "mail"},
+    "slack.post_message": {"post", "send", "slack", "channel"},
+    "slack.search_messages": {"search", "find", "latest", "discussion", "conversation"},
 }
+
+NO_TOOL_PATTERNS = (
+    "without calling any external tool",
+    "without using any tool",
+    "do not call any tool",
+    "no external tool",
+)
 
 
 def words(text: str) -> set[str]:
@@ -111,6 +127,13 @@ class HierarchicalRouter:
             for domain, servers in DOMAIN_SERVERS.items()
             if any(server.lower() in words(text) for server in servers)
         ]
+        lowered = text.lower()
+        if any(cue in lowered for cue in ("meeting", "design review", "appointment", "calendar event")):
+            explicit.insert(0, "calendar")
+        if any(cue in lowered for cue in ("discussion", "conversation", "slack channel", "thread")):
+            explicit.insert(0, "communication")
+        if any(cue in lowered for cue in ("tomorrow's weather", "weather tomorrow", "forecast")):
+            explicit.insert(0, "web")
         values = list(dict.fromkeys(explicit + [self.domain_names[int(i)] for i in order[: self.domain_k]]))
         return tuple(values)
 
@@ -121,10 +144,13 @@ class HierarchicalRouter:
         action = tool_action(item.tool)
         action_match = any(alias in query_words for alias in ACTION_ALIASES.get(action, set()))
         service_match = bool(query_words & SERVICE_CUES.get(item.tool.server, {item.tool.server.lower()}))
-        tool_match = bool(query_words & TOOL_CUES.get(item.tool.qualified_name, set()))
-        return item.score + 0.20 * overlap + 0.18 * action_match + 0.30 * service_match + 0.24 * tool_match
+        cue_words = TOOL_CUES.get(item.tool.qualified_name, set())
+        cue_match = len(query_words & cue_words) / max(1, min(2, len(cue_words)))
+        return item.score + 0.20 * overlap + 0.18 * action_match + 0.30 * service_match + 0.36 * cue_match
 
     def route(self, query: str) -> HierarchicalDecision:
+        if any(pattern in query.lower() for pattern in NO_TOOL_PATTERNS):
+            return HierarchicalDecision((AtomicTask(query, tuple()),), tuple(), False)
         pieces = decompose_intents(query)
         tasks = tuple(AtomicTask(piece, self.infer_domains(piece)) for piece in pieces)
         selected: dict[str, RankedTool] = {}
@@ -132,6 +158,17 @@ class HierarchicalRouter:
             allowed_servers = set().union(*(DOMAIN_SERVERS[domain] for domain in task.domains))
             ranked = [item for item in self.index.rank(task.text) if item.tool.server in allowed_servers]
             reranked = sorted(ranked, key=lambda item: (-self.hybrid_score(task.text, item), item.tool.qualified_name))
+            # Preserve at least one candidate from every inferred domain. A single
+            # global Top-K lets a strong source-control score erase a necessary
+            # communication step in cross-service workflows.
+            for domain in task.domains:
+                domain_items = [item for item in reranked if item.tool.server in DOMAIN_SERVERS[domain]]
+                if domain_items:
+                    item = domain_items[0]
+                    score = self.hybrid_score(task.text, item)
+                    previous = selected.get(item.tool.qualified_name)
+                    if previous is None or score > previous.score:
+                        selected[item.tool.qualified_name] = RankedTool(item.tool, score)
             for item in reranked[: self.tools_per_task]:
                 score = self.hybrid_score(task.text, item)
                 previous = selected.get(item.tool.qualified_name)
@@ -141,3 +178,4 @@ class HierarchicalRouter:
         # Multiple equally plausible communication/search domains require clarification rather than fake certainty.
         clarification = len(tasks) == 1 and len(tasks[0].domains) > 1 and max((item.score for item in candidates), default=0) < 0.45
         return HierarchicalDecision(tasks, candidates, clarification)
+
