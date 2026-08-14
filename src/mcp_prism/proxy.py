@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import uuid
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -55,6 +56,20 @@ class ProxyEngine:
                 "type": "function",
                 "function": {"name": tools[0].qualified_name},
             }
+            if not request.get("stream"):
+                # Qwen 1.5B can ignore OpenAI tool_choice and answer in prose.
+                # Constrained argument generation makes the gateway, rather than
+                # the model, authoritative for the already-selected first tool.
+                payload.pop("tools", None)
+                payload.pop("tool_choice", None)
+                payload["response_format"] = {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "mcp_tool_arguments",
+                        "strict": True,
+                        "schema": tools[0].input_schema,
+                    },
+                }
         payload["cache_prompt"] = cache_prompt
         # Stable metadata is intentionally not inserted into messages; doing so would perturb the measured prefix.
         return payload, {
@@ -67,7 +82,29 @@ class ProxyEngine:
                 ",".join(item.tool.qualified_name for item in retrieved)
                 if mode == "prism" else ",".join(tool.qualified_name for tool in tools)
             ),
+            "x-mcp-prism-forced-tool": tools[0].qualified_name if mode == "prism" and tools and not request.get("stream") else "",
         }
+
+
+def wrap_forced_tool_call(result: bytes, tool_name: str) -> bytes:
+    payload = json.loads(result)
+    choices = payload.get("choices") or []
+    if not choices:
+        return result
+    message = choices[0].setdefault("message", {})
+    content = message.get("content") or "{}"
+    try:
+        arguments = json.dumps(json.loads(content), ensure_ascii=False, separators=(",", ":"))
+    except (TypeError, json.JSONDecodeError):
+        arguments = "{}"
+    message["content"] = None
+    message["tool_calls"] = [{
+        "id": f"call_prism_{uuid.uuid4().hex[:12]}",
+        "type": "function",
+        "function": {"name": tool_name, "arguments": arguments},
+    }]
+    choices[0]["finish_reason"] = "tool_calls"
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
 
 class PrismHandler(BaseHTTPRequestHandler):
@@ -120,6 +157,9 @@ class PrismHandler(BaseHTTPRequestHandler):
                     self.close_connection = True
                 else:
                     result = response.read()
+                    forced_tool = prism_headers.get("x-mcp-prism-forced-tool", "")
+                    if forced_tool:
+                        result = wrap_forced_tool_call(result, forced_tool)
                     self.send_header("content-length", str(len(result)))
                     self.end_headers()
                     self.wfile.write(result)
