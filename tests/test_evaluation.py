@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.3 seconds
+Output:
 from mcp_prism.evaluation import CasePrediction, EvaluationCase, quality_gate, score_cases
 
 
@@ -11,6 +14,7 @@ def test_quality_metrics_and_gate():
         CasePrediction((), (), {}, True),
     ]
     scores = score_cases(cases, predictions)
-    assert all(value == 1.0 for value in scores.values())
+    assert scores["wrong_tool_call_rate"] == 0.0
+    assert all(value == 1.0 for key, value in scores.items() if key != "wrong_tool_call_rate")
     assert quality_gate(scores, scores) == (True, ())
 
