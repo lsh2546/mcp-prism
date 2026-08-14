@@ -61,6 +61,26 @@ class ProxyEngine:
         else:
             raise ValueError("x-mcp-prism-mode must be baseline or prism")
         payload["tools"] = encoded
+        if mode == "prism" and completed and not request.get("stream"):
+            # Some llama.cpp chat templates reject replayed OpenAI tool-call
+            # structures when the next turn uses constrained JSON rather than
+            # native tools. Preserve the evidence as plain assistant context;
+            # routing already consumed the structured calls above.
+            context = []
+            clean_messages = []
+            for message in messages:
+                if message.get("role") == "tool":
+                    context.append(str(message.get("content", "")))
+                elif message.get("role") == "assistant" and message.get("tool_calls"):
+                    continue
+                else:
+                    clean_messages.append(message)
+            if context:
+                clean_messages.append({
+                    "role": "assistant",
+                    "content": "Completed tool results:\n" + "\n".join(context),
+                })
+            payload["messages"] = clean_messages
         if mode == "prism" and tools:
             # The router owns workflow ordering; the LLM owns argument creation.
             # Pin the highest-ranked dependency-free operation so models cannot
