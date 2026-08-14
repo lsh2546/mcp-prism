@@ -7,7 +7,7 @@
 
 | Result | MCP Prism | Baseline | Evidence |
 |---|---:|---:|---|
-| Peak cache-ON throughput | **12.50 req/s** | 1.42 req/s | **8.80횞** |
+| Peak cache-ON throughput | **12.50 req/s** | 1.42 req/s | **8.80×** |
 | Held-out complete workflow success | **85%** | 60% | +25 percentage points |
 | Development first-step accuracy | **100%** | 33.3% | wrong first call: **0%** |
 | Prompt tokens, mixed workload | **207** | 4,903 | 95.8% fewer |
@@ -61,13 +61,13 @@ See [the full reproduction contract](docs/reproduce-arm64.md) for the pinned mod
 
 ## Repository map
 
-- `src/mcp_prism/` ??gateway, retrieval, canonicalization and proxy product code
-- `data/private/tool_catalog.json` ??61 realistic, overlapping MCP tools
-- `data/private/heldout_workflows_v3.json` ??frozen 20-request held-out workflow set
-- `scripts/` ??model fetch, quality evaluation and alternating benchmark
-- `.github/workflows/` ??native Arm64 quality and performance automation
-- `evidence/` ??final metric manifest and public run links
-- `dashboard/` ??judge-facing baseline-versus-Prism comparison
+- `src/mcp_prism/` — gateway, retrieval, canonicalization and proxy product code
+- `data/private/tool_catalog.json` — 61 realistic, overlapping MCP tools
+- `data/private/heldout_workflows_v3.json` — frozen 20-request held-out workflow set
+- `scripts/` — model fetch, quality evaluation and alternating benchmark
+- `.github/workflows/` — native Arm64 quality and performance automation
+- `evidence/` — final metric manifest and public run links
+- `dashboard/` — judge-facing baseline-versus-Prism comparison
 
 ## License
 
