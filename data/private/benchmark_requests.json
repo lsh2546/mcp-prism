@@ -1,11 +1,15 @@
+Exit code: 0
+Wall time: 0.3 seconds
+Output:
 [
-  {"id":"a01","workload":"A-common-prefix","query":"What is tomorrow's weather in Seoul?","expected":["weather.daily_forecast"]},
-  {"id":"a02","workload":"A-common-prefix","query":"Search my inbox for the newest invoice from Acme.","expected":["gmail.search_messages"]},
-  {"id":"a03","workload":"A-common-prefix","query":"List failed GitHub CI runs for the prism repository.","expected":["github.list_workflow_runs"]},
-  {"id":"b01","workload":"B-mixed-realistic","query":"Find the failed GitHub workflow, read its logs, and post a concise cause to Slack #engineering.","expected":["github.list_workflow_runs"]},
-  {"id":"b02","workload":"B-mixed-realistic","query":"Find the launch PDF, create a share link, and email it to Mina.","expected":["files.search_files"]},
-  {"id":"b03","workload":"B-mixed-realistic","query":"Find tomorrow's design review and send its time to the project Slack channel.","expected":["calendar.search_events"]},
-  {"id":"c01","workload":"C-adversarial-low-share","query":"Compare current CPU alerts with the latest incident discussion and attach the relevant repository issue.","expected":["monitoring.list_alerts"]},
-  {"id":"c02","workload":"C-adversarial-low-share","query":"Check the order referenced by the newest support email and refund it only if it is still eligible.","expected":["gmail.search_messages"]},
-  {"id":"c03","workload":"C-adversarial-low-share","query":"Summarize this paragraph without calling any external tool: Arm processors use a RISC instruction set.","expected":[]}
+  {"id":"a01","workload":"A-common-prefix","query":"What is tomorrow's weather in Seoul?","required_candidates":["weather.daily_forecast"],"valid_first_tools":["weather.daily_forecast"]},
+  {"id":"a02","workload":"A-common-prefix","query":"Search my inbox for the newest invoice from Acme.","required_candidates":["gmail.search_messages"],"valid_first_tools":["gmail.search_messages"]},
+  {"id":"a03","workload":"A-common-prefix","query":"List failed GitHub CI runs for the prism repository.","required_candidates":["github.list_workflow_runs"],"valid_first_tools":["github.list_workflow_runs"]},
+  {"id":"b01","workload":"B-mixed-realistic","query":"Find the failed GitHub workflow, read its logs, and post a concise cause to Slack #engineering.","required_candidates":["github.list_workflow_runs","github.get_workflow_logs","slack.post_message"],"valid_first_tools":["github.list_workflow_runs"]},
+  {"id":"b02","workload":"B-mixed-realistic","query":"Find the launch PDF, create a share link, and email it to Mina.","required_candidates":["files.search_files","files.share_file","gmail.send_message"],"valid_first_tools":["files.search_files"]},
+  {"id":"b03","workload":"B-mixed-realistic","query":"Find tomorrow's design review and send its time to the project Slack channel.","required_candidates":["calendar.search_events","slack.post_message"],"valid_first_tools":["calendar.search_events"]},
+  {"id":"c01","workload":"C-adversarial-low-share","query":"Compare current CPU metrics with the latest incident discussion and attach the relevant repository issue.","required_candidates":["monitoring.get_metrics","slack.search_messages","github.search_issues"],"valid_first_tools":["monitoring.get_metrics","slack.search_messages"]},
+  {"id":"c02","workload":"C-adversarial-low-share","query":"Check the order referenced by the newest support email and refund it only if it is still eligible.","required_candidates":["gmail.search_messages","commerce.search_orders","commerce.refund_order"],"valid_first_tools":["gmail.search_messages"]},
+  {"id":"c03","workload":"C-adversarial-low-share","query":"Summarize this paragraph without calling any external tool: Arm processors use a RISC instruction set.","required_candidates":[],"valid_first_tools":[]}
 ]
+
