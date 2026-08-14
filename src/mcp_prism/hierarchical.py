@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import re
@@ -58,6 +59,7 @@ SERVICE_CUES = {
 
 TOOL_CUES = {
     "github.list_workflow_runs": {"ci", "workflow", "failed", "runs"},
+    "github.search_issues": {"issue", "issues", "relevant", "attach", "find", "search"},
     "github.get_workflow_logs": {"ci", "workflow", "log", "logs", "failure"},
     "gmail.search_messages": {"email", "inbox", "newest", "latest", "from"},
     "files.search_files": {"file", "pdf", "document", "storage", "find", "search"},
@@ -176,13 +178,44 @@ class HierarchicalRouter:
         clarification = len(tasks) == 1 and len(tasks[0].domains) > 1 and max((item.score for item in candidates), default=0) < 0.45
         return HierarchicalDecision(tasks, candidates, clarification)
 
+    def workflow_plan(self, query: str, candidates: tuple[RankedTool, ...]) -> tuple[RankedTool, ...]:
+        """Choose one executable operation per expressed atomic task, in request order."""
+        if not candidates:
+            return ()
+        plan: list[RankedTool] = []
+        used: set[str] = set()
+        pieces: list[str] = []
+        for piece in decompose_intents(query):
+            if piece.lower().startswith("compare ") and re.search(r"\s+with\s+", piece, re.IGNORECASE):
+                pieces.extend(value.strip() for value in re.split(r"\s+with\s+", piece, maxsplit=1, flags=re.IGNORECASE))
+            else:
+                pieces.append(piece)
+        for piece in pieces:
+            domains = self.infer_domains(piece)
+            allowed = set().union(*(DOMAIN_SERVERS[domain] for domain in domains))
+            pool = [item for item in candidates if item.tool.server in allowed] or list(candidates)
+            ranked = sorted(
+                pool,
+                key=lambda item: (-self.hybrid_score(piece, item), item.tool.qualified_name),
+            )
+            choice = next((item for item in ranked if item.tool.qualified_name not in used), None)
+            if choice is not None:
+                plan.append(choice)
+                used.add(choice.tool.qualified_name)
+        return tuple(plan)
 
-def execution_frontier(query: str, candidates: tuple[RankedTool, ...]) -> tuple[RankedTool, ...]:
+
+def execution_frontier(
+    query: str,
+    candidates: tuple[RankedTool, ...],
+    completed: tuple[str, ...] = (),
+) -> tuple[RankedTool, ...]:
     """Return tools whose inputs are available before any workflow result exists."""
     lowered = query.lower()
     sequenced = any(token in lowered for token in (" and ", " then ", ",", "referenced", "relevant", " its ", " it "))
+    remaining = tuple(item for item in candidates if item.tool.qualified_name not in completed)
     if not sequenced:
-        return candidates
+        return remaining
 
     def independent(item: RankedTool) -> bool:
         name = item.tool.name.lower()
@@ -191,6 +224,26 @@ def execution_frontier(query: str, candidates: tuple[RankedTool, ...]) -> tuple[
             or name in {"current_conditions", "daily_forecast", "weather_alerts", "get_metrics", "geocode", "nearby_places", "route"}
         )
 
-    frontier = tuple(item for item in candidates if independent(item))
-    return frontier or candidates
+    # Before any result exists, only source operations have satisfiable inputs.
+    # Afterwards expose one dependency tier at a time. This prevents a model
+    # from posting/refunding before it has read the content or identifier that
+    # supplies the required arguments.
+    if not completed:
+        frontier = tuple(item for item in remaining if independent(item))
+        return frontier or remaining
+
+    def tier(item: RankedTool) -> int:
+        name = item.tool.name.lower()
+        if independent(item):
+            return 0
+        if name.startswith(("get_", "read_", "download_")):
+            return 1
+        if any(token in name for token in ("share", "create_link", "upload")):
+            return 2
+        if any(token in name for token in ("send", "post", "reply", "refund", "update", "delete", "move")):
+            return 3
+        return 1
+
+    minimum = min((tier(item) for item in remaining), default=0)
+    return tuple(item for item in remaining if tier(item) == minimum)
 
