@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.3 seconds
+Output:
 from __future__ import annotations
 
 import json
@@ -52,6 +55,7 @@ class ProxyEngine:
             "x-mcp-prism-prefix": fingerprint,
             "x-mcp-prism-atomic-tasks": str(tasks),
             "x-mcp-prism-schema-chars": str(len(json.dumps(encoded, separators=(",", ":")))),
+            "x-mcp-prism-tool-names": ",".join(tool.qualified_name for tool in tools),
         }
 
 
