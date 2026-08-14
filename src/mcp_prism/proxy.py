@@ -40,7 +40,8 @@ class ProxyEngine:
         elif mode == "prism":
             decision = self.router.route(str(query))
             retrieved = decision.candidates
-            tools = [item.tool for item in execution_frontier(str(query), retrieved)]
+            frontier = execution_frontier(str(query), retrieved)
+            tools = [frontier[0].tool] if frontier else []
             fingerprint, encoded = canonical_tool_bundle(tools)
             tasks = len(decision.tasks)
         else:
