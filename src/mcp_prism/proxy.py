@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 import json
@@ -45,6 +46,11 @@ class ProxyEngine:
         else:
             raise ValueError("x-mcp-prism-mode must be baseline or prism")
         payload["tools"] = encoded
+        if mode == "prism" and tools:
+            # The router has already made the no-tool decision. Requiring one of
+            # the dependency-free frontier tools prevents the downstream model
+            # from answering in prose instead of beginning an executable plan.
+            payload["tool_choice"] = "required"
         payload["cache_prompt"] = cache_prompt
         # Stable metadata is intentionally not inserted into messages; doing so would perturb the measured prefix.
         return payload, {
