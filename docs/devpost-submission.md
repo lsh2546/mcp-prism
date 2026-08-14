@@ -1,5 +1,5 @@
 
-# MCP Prism ??Devpost submission copy
+# MCP Prism — Devpost submission copy
 
 ## Track
 
@@ -11,11 +11,11 @@ Stop Arm64 AI agents from pre-filling every MCP tool schema on every request.
 
 ## Elevator pitch
 
-MCP Prism is an OpenAI-compatible Arm64 inference gateway that retrieves only the next dependency-ready MCP tool, canonicalizes stable schema bundles, and reuses llama.cpp prompt/KV prefixes. On native Arm Neoverse-N2 it reaches up to **8.80횞 throughput**, improves frozen held-out workflow success from **60% to 85%**, and achieves **100% first-step accuracy**.
+MCP Prism is an OpenAI-compatible Arm64 inference gateway that retrieves only the next dependency-ready MCP tool, canonicalizes stable schema bundles, and reuses llama.cpp prompt/KV prefixes. On native Arm Neoverse-N2 it reaches up to **8.80× throughput**, improves frozen held-out workflow success from **60% to 85%**, and achieves **100% first-step accuracy**.
 
 ## Inspiration
 
-An agent with dozens of MCP integrations often sends every tool name, description, and JSON Schema to the LLM?봢ven when a request needs only one tool. On CPU inference this turns irrelevant schemas into repeated prefill work. Existing prefix caches help only after a prefix is already identical. We wanted to reshape the request before inference so fewer tokens are processed and more prefixes become reusable.
+An agent with dozens of MCP integrations often sends every tool name, description, and JSON Schema to the LLM—even when a request needs only one tool. On CPU inference this turns irrelevant schemas into repeated prefill work. Existing prefix caches help only after a prefix is already identical. We wanted to reshape the request before inference so fewer tokens are processed and more prefixes become reusable.
 
 ## What it does
 
@@ -41,15 +41,15 @@ Performance and quality are measured separately. Performance generates only the 
 
 The final cache-ON native Arm64 run uses the same model, request, sampling settings, output limit, host, and four CPU threads for both paths. Baseline receives all 61 schemas; Prism receives one dependency-ready schema.
 
-- **Peak throughput: 8.80횞** on the mixed realistic workload
-- **All workloads: 5.60횞 to 8.80횞 throughput**
-- **Mixed prompt tokens: 4,903 ??207**
-- **Mixed p95 TTFT: 717 ms ??100 ms**
-- **Held-out complete workflows: 60% ??85%** across 20 frozen requests
+- **Peak throughput: 8.80×** on the mixed realistic workload
+- **All workloads: 5.60× to 8.80× throughput**
+- **Mixed prompt tokens: 4,903 → 207**
+- **Mixed p95 TTFT: 717 ms → 100 ms**
+- **Held-out complete workflows: 60% → 85%** across 20 frozen requests
 - **Development first-step accuracy: 100%**
 - **Wrong first calls: 0%**
 
-The low-sharing adversarial workload still reaches 7.49횞 throughput, so the headline is not produced only by repeated synthetic prompts.
+The low-sharing adversarial workload still reaches 7.49× throughput, so the headline is not produced only by repeated synthetic prompts.
 
 ## Challenges
 
