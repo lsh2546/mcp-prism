@@ -34,6 +34,13 @@ class ProxyEngine:
         query = next(
             (message.get("content", "") for message in reversed(messages) if message.get("role") == "user"), ""
         )
+        completed = tuple(
+            call.get("function", {}).get("name", "")
+            for message in messages
+            if message.get("role") == "assistant"
+            for call in (message.get("tool_calls") or [])
+            if call.get("function", {}).get("name")
+        )
         if mode == "baseline":
             tools = list(self.tools)
             fingerprint, encoded = canonical_tool_bundle(tools)
@@ -41,8 +48,14 @@ class ProxyEngine:
         elif mode == "prism":
             decision = self.router.route(str(query))
             retrieved = decision.candidates
-            frontier = execution_frontier(str(query), retrieved)
-            tools = [frontier[0].tool] if frontier else []
+            plan = self.router.workflow_plan(str(query), retrieved)
+            next_planned = next(
+                (item for item in plan if item.tool.qualified_name not in completed),
+                None,
+            )
+            frontier = execution_frontier(str(query), retrieved, completed)
+            chosen = next_planned or (frontier[0] if frontier else None)
+            tools = [chosen.tool] if chosen else []
             fingerprint, encoded = canonical_tool_bundle(tools)
             tasks = len(decision.tasks)
         else:
