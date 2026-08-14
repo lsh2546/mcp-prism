@@ -100,7 +100,17 @@ def main() -> None:
     cases = json.loads(args.data.read_text(encoding="utf-8"))
     catalog = json.loads(args.catalog.read_text(encoding="utf-8"))
     schemas = {f"{row['server']}.{row['name']}": row["input_schema"] for row in catalog}
-    rows = [run_case(args.url, case, mode, schemas) for case in cases for mode in ("baseline", "prism")]
+    rows = []
+    for case in cases:
+        for mode in ("baseline", "prism"):
+            try:
+                rows.append(run_case(args.url, case, mode, schemas))
+            except Exception as error:
+                rows.append({
+                    "id": case["id"], "mode": mode, "expected": case["workflow"],
+                    "actual": [], "arguments_valid": [], "workflow_success": False,
+                    "mean_delivered_tools": 0.0, "error": repr(error),
+                })
     summary = {}
     for mode in ("baseline", "prism"):
         selected = [row for row in rows if row["mode"] == mode]
