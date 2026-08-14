@@ -1,0 +1,24 @@
+
+[
+  {"id":"v201","category":"single-explicit","query":"Show active weather alerts for Jeju Island.","workflow":["weather.weather_alerts"]},
+  {"id":"v202","category":"single-explicit","query":"Create a Gmail draft to Sora about the revised launch date.","workflow":["gmail.create_draft"]},
+  {"id":"v203","category":"single-explicit","query":"Read docs/setup.md from the GitHub aurora repository.","workflow":["github.read_file"]},
+  {"id":"v204","category":"single-implicit","query":"Explain the execution plan for a query joining invoices and accounts.","workflow":["database.explain_query"]},
+  {"id":"v205","category":"single-explicit","query":"Move /incoming/logo.svg into the /approved folder in storage.","workflow":["files.move_file"]},
+  {"id":"v206","category":"single-explicit","query":"Update task OPS-418 to in progress and set its due date to Friday.","workflow":["tasks.update_task"]},
+  {"id":"v207","category":"single-implicit","query":"Find the contact record for Daeun Kim.","workflow":["contacts.search_contacts"]},
+  {"id":"v208","category":"multi-sequential","query":"Search Gmail for messages tagged onboarding and apply the archived label to the matching thread.","workflow":["gmail.search_messages","gmail.modify_labels"]},
+  {"id":"v209","category":"multi-sequential","query":"Find the calendar event named partner briefing and reschedule it to 3 PM Friday.","workflow":["calendar.search_events","calendar.update_event"]},
+  {"id":"v210","category":"multi-sequential","query":"Locate budget-2027.xlsx in storage and move it into the finance archive folder.","workflow":["files.search_files","files.move_file"]},
+  {"id":"v211","category":"multi-cross-service","query":"Search academic papers for recent SVE2 inference studies and save a short digest as a text file.","workflow":["search.academic_search","files.write_text"]},
+  {"id":"v212","category":"multi-sequential","query":"Get API latency metrics for checkout-service and create an alert when p95 exceeds 800 milliseconds.","workflow":["monitoring.get_metrics","monitoring.create_alert"]},
+  {"id":"v213","category":"multi-cross-service","query":"Find Nari Lee in contacts and schedule a calendar event with her called supplier review.","workflow":["contacts.search_contacts","calendar.create_event"]},
+  {"id":"v214","category":"multi-cross-service","query":"Find the newest order for customer Cedar Labs and create a project task to verify its delivery address.","workflow":["commerce.search_orders","tasks.create_task"]},
+  {"id":"v215","category":"multi-cross-service","query":"Find coffee shops near Seoul Station and post the closest option to Slack #travel.","workflow":["maps.nearby_places","slack.post_message"]},
+  {"id":"v216","category":"multi-cross-service","query":"List failed CI workflow runs in the comet GitHub repository and create a task to investigate the newest failure.","workflow":["github.list_workflow_runs","tasks.create_task"]},
+  {"id":"v217","category":"multi-sequential","query":"Search Slack for the thread about release candidate seven and reply that verification is complete.","workflow":["slack.search_messages","slack.reply_thread"]},
+  {"id":"v218","category":"no-tool","query":"Without using any tool, define speculative execution in one sentence.","workflow":[]},
+  {"id":"v219","category":"no-tool","query":"No external tool: alphabetize these words: pear, apple, orange.","workflow":[]},
+  {"id":"v220","category":"no-tool","query":"Do not call any tool; calculate 12 multiplied by 7.","workflow":[]}
+]
+
