@@ -1,7 +1,11 @@
-
 # MCP Prism
 
 > An OpenAI-compatible gateway that stops Arm64 AI agents from pre-filling every MCP tool schema on every request.
+
+**Arm Create challenge track: Cloud AI**
+
+- [Live judge dashboard](https://lsh2546.github.io/mcp-prism/)
+- [2:26 native Arm64 demo video](https://youtu.be/kJAAe7bmHDk)
 
 ## Native Arm64 results
 
@@ -17,7 +21,7 @@ Measured on a native `aarch64` GitHub runner with a 4-core Arm Neoverse-N2 CPU, 
 - [Final native Arm64 performance run](https://github.com/lsh2546/mcp-prism/actions/runs/31783556529)
 - [Frozen held-out workflow run](https://github.com/lsh2546/mcp-prism/actions/runs/31782960486)
 - [Evidence manifest](evidence/final-native-arm64.json)
-- [Live comparison dashboard](dashboard/index.html)
+- [Dashboard source](dashboard/index.html)
 
 ## What it does
 
